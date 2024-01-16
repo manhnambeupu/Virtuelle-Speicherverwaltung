@@ -1,0 +1,8 @@
+{
+    "bitoAI.codeCompletion.enableAutoCompletion": true,
+    "bitoAI.codeCompletion.enableCommentToCode": true,
+    "files.associations": {
+        "limits.h": "c",
+        "signal.h": "c"
+    }
+}

@@ -44,7 +44,7 @@
  * 
  *  @return     void 
  ****************************************************************************************/
-static void fetch_page_from_disk(int page, int frame);
+static void fetch_page_from_disk(int page, int frame);//Lấy một trang từ đĩa vào bộ nhớ.
 
 /**
  *****************************************************************************************
@@ -55,7 +55,7 @@ static void fetch_page_from_disk(int page, int frame);
  * 
  *  @return     void 
  ****************************************************************************************/
-static void remove_page_from_memory(int page);
+static void remove_page_from_memory(int page);//Loại bỏ một trang khỏi bộ nhớ chính.
 
 /**
  *****************************************************************************************
@@ -79,7 +79,7 @@ static void vmem_init(void);
  *  @return     idx of the unused frame with the smallest idx. 
  *              If all frames are in use, VOID_IDX will be returned.
  ****************************************************************************************/
-static int find_unused_frame();
+static int find_unused_frame();//Tìm khung không sử dụng trong bộ nhớ.
 
 /**
  *****************************************************************************************
@@ -95,7 +95,7 @@ static int find_unused_frame();
  *
  *  @return     void 
  ****************************************************************************************/
-static void allocate_page(const int req_page, const int g_count);
+static void allocate_page(const int req_page, const int g_count);//Phân bổ trang mới vào bộ nhớ trong trường hợp trang bị lỗi.
 
 /**
  *****************************************************************************************
@@ -116,7 +116,7 @@ static void sighandler(int signo);
  *
  *  @return     void 
  ****************************************************************************************/
-static void dump_pt(void);
+static void dump_pt(void);//In ra thông tin bảng trang.
 
 /**
  *****************************************************************************************
@@ -131,7 +131,7 @@ static void dump_pt(void);
  *  @param      frame Number of frame that will be used to store the page.
  *
  ****************************************************************************************/
-static void find_remove_aging(int page, int * removedPage, int *frame);
+static void find_remove_aging(int page, int * removedPage, int *frame);//Thực hiện thuật toán thay thế trang theo tuổi.
  
 /**
  *****************************************************************************************
@@ -143,7 +143,7 @@ static void find_remove_aging(int page, int * removedPage, int *frame);
  *
  *  @return     void
  ****************************************************************************************/
-static void update_age_reset_ref(void);
+static void update_age_reset_ref(void);//Cập nhật thông tin tuổi và đặt lại các bit tham chiếu cho thuật toán theo tuổi
 
 /**
  *****************************************************************************************
@@ -158,7 +158,7 @@ static void update_age_reset_ref(void);
  *  @param      frame Number of frame that will be used to store the page.
  *
  ****************************************************************************************/
-static void find_remove_fifo(int page, int * removedPage, int *frame);
+static void find_remove_fifo(int page, int * removedPage, int *frame);//Thực hiện thuật toán thay thế trang FIFO
 
 /**
  *****************************************************************************************
@@ -173,7 +173,7 @@ static void find_remove_fifo(int page, int * removedPage, int *frame);
  *  @param      frame Number of frame that will be used to store the page.
  *
  ****************************************************************************************/
-static void find_remove_clock(int page, int * removedPage, int *frame);
+static void find_remove_clock(int page, int * removedPage, int *frame);//Thực hiện thuật toán thay thế trang Clock
 
 /**
  *****************************************************************************************
@@ -181,7 +181,7 @@ static void find_remove_clock(int page, int * removedPage, int *frame);
  *
  *  @return     void 
  ****************************************************************************************/
-static void cleanup(void) ;
+static void cleanup(void) ;//Dọn sạch tài nguyên khi mmanage kết thúc.
 
 /**
  *****************************************************************************************
@@ -194,7 +194,7 @@ static void cleanup(void) ;
  *
  *  @return     void 
  ****************************************************************************************/
-static void scan_params(int argc, char **argv);
+static void scan_params(int argc, char **argv);//Quét các tham số dòng lệnh để xác định thuật toán thay thế trang.
 
 /**
  *****************************************************************************************
@@ -206,7 +206,7 @@ static void scan_params(int argc, char **argv);
  *
  *  @return     void 
  ****************************************************************************************/
-static void print_usage_info_and_exit(char *err_str, char * programName);
+static void print_usage_info_and_exit(char *err_str, char * programName); // In thông tin sử dụng và thoát nếu có tham số không đúng.
 
 /*
  * variables for memory management
@@ -324,6 +324,10 @@ void print_usage_info_and_exit(char *err_str, char *programName) {
 	exit(EXIT_FAILURE);
 }
 
+/*
+    SIGUSR2(User-defined Signal2) : tín hiệu này để thông báo giữa các quá trình
+    SIGINT(Interrupt Signal): tín hiệu gửi khi Ctr C
+*/
 void sighandler(int signo) {
 if(signo == SIGUSR2) {
         dump_pt();
@@ -372,27 +376,63 @@ void dump_pt(void) {
 /* Your code goes here... */
 
 void cleanup(void) {
+    // Đóng tệp nhật ký
+    close_logger();
+
+    // Giải phóng tài nguyên của pagefile và shared memory
+    cleanup_pagefile();
+
+    if (shm_id != -1) {
+        // Nếu đã attach shared memory, thì detach nó
+        if (vmem != NULL) {
+            shmdt(vmem);
+            vmem = NULL;
+        }
+
+        // Nếu không còn process nào attach shared memory, thì xóa nó
+        struct shmid_ds shmid_ds;
+        if (shmctl(shm_id, IPC_STAT, &shmid_ds) != -1) {
+            if (shmid_ds.shm_nattch == 0) {
+                shmctl(shm_id, IPC_RMID, NULL);
+            }
+        }
+    }
 }
 
+
 void vmem_init(void) {
+    // Generate a key for shared memory
+    key_t key = ftok(SHMKEY, SHMPROCID);
+    TEST_AND_EXIT_ERRNO(key == -1, "Error creating key with ftok");
 
-    /* Create System V shared memory */
+    // Get shared memory segment
+    shm_id = shmget(key, SHMSIZE, 0664 | IPC_CREAT);
+    TEST_AND_EXIT_ERRNO(shm_id == -1, "Error creating shared memory with shmget");
 
-    /* We are creating the shm, so set the IPC_CREAT flag */
+    // Attach shared memory to vmem
+    vmem = (struct vmem_struct *)shmat(shm_id, NULL, 0);
+    TEST_AND_EXIT_ERRNO(vmem == (struct vmem_struct *)-1, "Error attaching shared memory with shmat");
 
-    /* Attach shared memory to vmem (virtual memory) */
-
-    /* Fill with zeros */
+    // Fill with zeros
     memset(vmem, 0, SHMSIZE);
 }
 
 int find_unused_frame() {
+    for (int i = 0; i < VMEM_NFRAMES; i++) {
+        if (vmem->pt[i].flags == PTF_UNUSED) {
+            // Frame không được sử dụng, trả về chỉ số của nó
+            return i;
+        }
+    }
+
+    // Nếu không có frame trống nào được tìm thấy, trả về VOID_IDX hoặc một giá trị thích hợp
+    return VOID_IDX;
 }
 
 void allocate_page(const int req_page, const int g_count) {
     int frame = VOID_IDX;
     int removedPage = VOID_IDX;
-    struct logevent le;
+    struct logevent le; 
 
     /* Log action */
     le.req_pageno = req_page;
@@ -400,13 +440,49 @@ void allocate_page(const int req_page, const int g_count) {
     le.alloc_frame = frame;
     le.g_count = g_count; 
     le.pf_count = pf_count;
-    logger(le);
+    logger(le); 
 }
 
 void fetch_page_from_disk(int page, int frame){
+        // Kiểm tra tính hợp lệ của page và frame
+    if (page < 0 || page >= VMEM_NPAGES) {
+        printf("Error: Invalid page number!");
+        return;
+    }
+
+    if (frame < 0 || frame >= VMEM_NFRAMES){ 
+        printf("Error: Invalid frame number!");
+        return;
+    }
+
+    // Đọc trang từ file pagefile vào khung bộ nhớ
+    fetch_page_from_pagefile(page, vmem->mainMemory + frame*VMEM_PAGESIZE);
+    
+    // Cập nhật bảng trang
+    vmem->pt[page].frame = frame;
+    vmem->pt[page].flags |= PTF_PRESENT; // Đánh dấu trang đã có trong bộ nhớ
+
+    printf("Page loaded %d to the frame %d\n", page, frame);
 }
 
 void remove_page_from_memory(int page){
+  // Kiểm tra tính hợp lệ của số trang
+  if (page < 0 || page >= VMEM_NPAGES) {
+    printf("Error: Invalid page number!");
+    return;
+  }
+  // Lấy số khung chứa trang cần loại bỏ
+  int frame = vmem->pt[page].frame;
+  // Nếu trang đã bị thay đổi, ghi nó vào pagefile trước
+  if (vmem->pt[page].flags & PTF_DIRTY) {
+    store_page_to_pagefile(page, vmem->mainMemory + frame * VMEM_PAGESIZE);
+  }
+
+  // Giải phóng khung đó trong bộ nhớ chính
+  vmem->pt[page].frame = VOID_IDX;  
+  vmem->pt[page].flags = PTF_UNUSED; 
+
+  printf("Page removed %d from the frame %d\n", page, frame);
 }
 
 void find_remove_fifo(int page, int * removedPage, int *frame){
@@ -419,6 +495,21 @@ static void find_remove_aging(int page, int * removedPage, int *frame){
 }
 
 static void update_age_reset_ref(void){
+    // Duyệt tất cả các khung có chứa trang hợp lệ
+    for (int i = 0; i < VMEM_NFRAMES; i++) {
+        if (vmem->pt[age[i].page].flags & PTF_PRESENT) {
+            // Tăng tuổi của trang
+            age[i].age++; 
+
+            // Nếu tuổi của trang vượt quá giới hạn, đặt lại nó về 0
+            // 8 bit = 0x7F
+            if (age[i].age > 0x7F) {
+                age[i].age = 0;
+            }
+
+            // Đặt lại bit tham chiếu của trang
+            vmem->pt[age[i].page].flags &= ~PTF_REF;
+        }
 } 
 
 // EOF

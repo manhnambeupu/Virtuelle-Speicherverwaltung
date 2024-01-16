@@ -39,8 +39,8 @@
 #define PTF_PRESENT     1 //Trang hiện đang được chọn (present).
 #define PTF_DIRTY       2 // Trang có thay đổi và cần được ghi
 #define PTF_REF         4 // Tham chiếu đến trang
-
-#define VOID_IDX -1       //!< Constant for invalid page or frame reference
+#define PTF_UNUSED		0 
+#define VOID_IDX 		-1       //!< Constant for invalid page or frame reference
 
 /**
  * Page table entry
