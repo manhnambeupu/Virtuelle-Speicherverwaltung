@@ -533,6 +533,28 @@ static void find_remove_clock(int page, int * removedPage, int *frame){
 }
 
 static void find_remove_aging(int page, int * removedPage, int *frame){
+    int oldest_age = 0x7F; 
+    int oldest_page = VOID_IDX;
+    int i;
+
+    // Duyệt tất cả các khung để tìm khung có trang lâu nhất không được truy cập
+    for (i = 0; i < VMEM_NFRAMES; i++) { 
+        if (vmem->pt[age[i].page].flags & PTF_PRESENT) { //Nếu khung chứa trang hợp lệ
+            //Kiểm tra xem trang này có phải là trang lâu nhất không
+            if (age[i].age > oldest_age) { 
+                oldest_age = age[i].age; 
+                oldest_page = age[i].page; 
+            } 
+        }
+    }
+    // Nếu tìm thấy trang lâu nhất, gán nó cho trang cần thay thế 
+    // và cập nhật khung được sử dụng
+    if (oldest_page != VOID_IDX) { 
+        *removedPage = oldest_page; 
+        *frame = vmem->pt[oldest_page].frame; 
+    } else { //Nếu không tìm thấy trang nào để thay thế
+        *frame = find_unused_frame(); //Tìm khung trống
+    }
 }
 
 static void update_age_reset_ref(void){
