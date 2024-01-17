@@ -486,9 +486,29 @@ void remove_page_from_memory(int page){
 }
 
 void find_remove_fifo(int page, int * removedPage, int *frame){
+     //Duyệt tất cả các khung để tìm khung chứa trang cũ nhất  
+    for (int i = 0; i < VMEM_NFRAMES; i++) { 
+        if (vmem->pt[i].flags & PTF_PRESENT) { //Nếu khung chứa trang hợp lệ 
+            //Kiểm tra xem trang này có phải là trang cũ nhất không 
+            if (vmem->pt[i].frame == *removedPage) { 
+                //Nếu đúng, gán khung này cho trang mới và thoát khỏi vòng lặp 
+                *frame = i; 
+                vmem->pt[page].frame = i; 
+                vmem->pt[page].flags |= PTF_PRESENT; 
+                return; 
+            } 
+            //Nếu không phải, cập nhật removedPage bằng trang cũ hơn 
+            else if (vmem->pt[i].frame < *removedPage) { 
+                *removedPage = vmem->pt[i].frame; 
+            } 
+        } 
+    } 
+    //Nếu không tìm thấy khung trống nào, trả về VOID_IDX  
+    *frame = VOID_IDX; 
 }
 
 static void find_remove_clock(int page, int * removedPage, int *frame){
+    
 }
 
 static void find_remove_aging(int page, int * removedPage, int *frame){
