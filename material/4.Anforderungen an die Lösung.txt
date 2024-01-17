@@ -1,0 +1,16 @@
+4. Anforderungen an die Lösung
+In Teams finden sich die Log Files für die drei Seitenersetzungsalgorithmen, wobei 
+der Zufallszahlengenerator mit 2806 initialisiert wurde. Für die Abnahme wird 
+überprüft, ob die Lösung hierfür die gleichen Log Files generiert. Es ist wichtig, dass 
+Sie schon vor dem Praktikum sicherstellen, dass Ihre Log Files mit denen aus TEAMs 
+übereinstimmen.
+Beachten Sie hierzu folgende Tipps:
+1. Die Log Files für die Seitenersetzungsalgorithmen FIFO und CLOCK sollten 
+schnell mit Ihrer Lösung übereinstimmen. Erst wenn diese stabil laufen, 
+sollten Sie das Aging Verfahren umsetzen.
+2. Falls die Log Files zu Ihrem Agigng Verfahren mit den gegebenen Log Files 
+übereinstimmen, dann müssen Sie anhand der Ausgaben Ihres Programms 
+die korrekte Funktionsweise des Aging Algorithmus darstellen können.
+3. Die Musterlösung und somit die Simulationsergebnisse für seed 2806 
+können fehlerhaft sein. Wenn Sie einen Fehler finden melden Sie mir dies 
+bitte per Mail.

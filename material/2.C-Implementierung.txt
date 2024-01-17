@@ -1,0 +1,44 @@
+2. C-Implementierung
+Allgemein soll das System aus folgenden Dateien bestehen
+1. Das Modul vmappl.c stellt das Anwendungsprogramm dar. 
+a. Es werden zufällige Daten erzeugt, angezeigt, mit Quicksort oder 
+Bubblesort sortiert und erneut angezeigt. 
+b. Der Parameter seed initialisiert den Zufallszahlengenerator
+2. Das Modul vmaccess.c bildet die Schnittstelle zum virtuellen Speicher. 
+Im realen System ist dies die Adress-Decodierungseinheit (Mapping von 
+virtuellen auf reale Adressen). 
+a. Die Methoden vmem_read und vmem_write berechnen aus der 
+virtuellen Speicheradresse die Frame-Nummer und den Offset.
+b. Ist die benötigte Seite nicht geladen, wird die Speicherverwaltung
+(mmanage.c) über einen Auftrag (syncdataexchange.c) 
+aufgefordert die Seite aus dem pagefile in den Hauptspeicher zu 
+laden. Sie sucht einen freien Seitenrahmen, lagert ggf. eine Seite 
+entsprechend den Algorithmen FIFO, CLOCK oder Aging aus und liest 
+die gewünschte Seite ein.
+c. Die Routinen aus vmaccess.c blockieren so lange bis mmanage
+die synchrone Kommunikation mit einem ACK abgeschlossen hat.
+3. Das Modul mmanage.c ist für die Verwaltung der im Hauptspeicher 
+vorhandenen Seitenrahmen zuständig.
+a. Nach der Initialisierung wartet das Modul auf Aufträge von vmappl. 
+b. Den Zugriff auf die pagefile realisiert dabei das Modul 
+pagefile.c; ein entsprechendes File ist in TEAMs hinterlegt.
+c. Beim Start initialisiert mmanage.c das Shared Memory, die 
+synchrone Kommunikation, installiert mit sigaction()die 
+Signalhandler, erzeugt bei Bedarf die Datei pagefile und 
+initialisiert die Datenstrukturen. Ein Teil dieser Funktionen finden Sie 
+im Modul mmanage.c fertig implementiert.
+d. Außerdem ruft mmanage.c bei jedem Seitenfehler die Methode 
+logger() auf, die jede Aktion im Logfile protokolliert. Diese 
+Methode sollte nicht geändert werden. So kann man Logfiles mit 
+diff vergleichen; ein entsprechendes Modul findet sich im 
+Quellcode.
+e. Beendet wird das Programm mit <STRG>-<C>. Alle Ressourcen müssen 
+dem Betriebssystem zurückgegeben werden, sonst kann es zu 
+Problemen bei einer erneuten Ausführung der Simulation kommen. 
+Also müssen Sie die entsprechenden cleanup Funktionen im 
+Signalhandler zu SIGINT einhängen. Die mitgelieferte Datei.
+mmanage.c enthält hierfür bereits einzelne Teile des notwendigen 
+Quellcodes.
+4. Das Modul vmem.h definiert die Datenstruktur struct vmem_struct
+mit allen weiteren Strukturen und Konstanten. Bitte arbeiten Sie vorab die 
+mitgelieferte Dokumentation dieser Datenstrukturen durch.

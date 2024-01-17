@@ -1,0 +1,52 @@
+Virtuelle Speicherverwaltung:
+
+1. Aufgabenbeschreibung
+Diese Aufgabe untersucht Mechanismen der virtuellen Speicherverwaltung. Es 
+wird eine Simulation für die Seitenersetzungsalgorithmen FIFO, CLOCK und Aging
+erstellt. An die Stelle des physikalischen Speichers eines realen Systems tritt hier 
+ein Speicherbereich im Shared Memory. Über einen weiteren gemeinsamen 
+Speicher sendet die Anwendung Aufträge an den Memory Manager 
+(syncdataexchange.c). Über zwei Semaphore wird der Datenaustausch als 
+synchrone Kommunikation realisiert. Neben der Lösung der Aufgabe selbst gibt es 
+die realitätsnahe Anforderung, dass Sie existierenden Code anpassen müssen.
+
+1. Die Abbildung stellt die beiden Prozesse vmappl und mmanage dar.
+a. vmappl ist eine Anwendung, die ein Feld von ganzen Zahlen 
+wahlweise mit QuickSort oder BubbleSort sortiert.
+b. mmanage implementiert die virtuelle Speicherverwaltung.
+2. Die Prozesse kommunizieren über zwei Shared Memory Bereiche. Der 
+SHMKEY des ersten Bereichs ist ./src/vmem.h. Die zugehörige C Datei 
+lautet vmem.h. In diesem Bereich liegt zum einen das mainMemory. Es 
+repräsentiert den Hauptspeicher und ist VMEM_PHYSMEMSIZE Byte groß. 
+Der Hauptspeicher ist in Seitenrahmen der Größe VMEM_PAGESIZE
+unterteilt. In der Realität liegt der gesamte virtuelle Speicher auf der 
+Festplatte. Dies wird durch die Datei pagefile nachgebildet. Die Größe 
+des virtuellen Speichers beträgt VMEM_VIRTMEMSIZE Byte. Er ist in Seiten 
+der Größe VMEM_PAGESIZE unterteilt. Diese werden in der Datei 
+pagefile hintereinander abgelegt. Somit nimmt der Prozess mmanage
+eine Seite aus der Datei pagefile und lagert sie in einen Seitenrahmen 
+von mainMemory ein. Wenn eine Seite aus einem Seitenrahmen verdrängt 
+wird, dann schreibt mmanage die modifizierte Seite an die richtige Stelle in 
+der Datei pagefile zurück.
+3. Weiterhin liegt die Seitentabelle (page table) im Shared Memory mit dem 
+SHMKEY ./src/vmem.h . Die Seitentabelle wird vom Prozess mmanage
+gepflegt und von dem Modul vmaccess , das im Prozess vmappl
+eingebunden ist, gelesen.
+4. Der Prozess vmappl stellt eine Anwendung dar. Sie füllt zuerst ein Feld mit 
+Zufallszahlen und sortiert es anschließend. Das Feld liegt im virtuellen 
+Speicher. Somit lädt mmanage die jeweils benötigten Seiten in einen 
+Seitenrahmen. Der zweite Teil steht im Modul vmaccess.c und bildet über 
+die beiden Funktionen vmem_read und vmem_write die Schnittstelle 
+zum Speicher.
+5. Das zweite Shared Memory wird im Modul syncdataexchange.c
+implementiert. Über diesen Mechanismus werden Aufträge an den Memory 
+Manager geschickt. Über zwei Semaphore wird die Kommunikation zwischen 
+Anwendung und Memory Manager synchronisiert.
+6. Weiterhin müssen vmem_read und vmem_write, die die Umrechnung 
+von virtuellen - in physikalische Adressen vornehmen und den mmanage
+über einen PageFault informieren. Ist dies der Fall, blockt vmem_read bzw. 
+vmem_write bis mmanage mitteilt, dass die zum PageFault gehörige Seite 
+in einem Seitenrahmen eingelagert ist und die Seitentabelle aktualisiert 
+wurde.
+
+

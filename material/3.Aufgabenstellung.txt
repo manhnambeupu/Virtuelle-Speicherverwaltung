@@ -1,0 +1,24 @@
+3. Aufgabenstellung
+Schreiben Sie gemäß der oben spezifizierten Anwendung die Speicherverwaltung
+für mmanage und vmaccess. Der Code des Anwenderprogramms vmappl ist in 
+TEAMs gegeben.
+Hinweise:
+• Zu Ihrer Unterstützung finden Sie neben dem Code des 
+Anwendungsprogramms einige Hilfsfunktionen und Datenstrukturen im 
+Code unter Teams. Die entsprechende DoxyGen Dokumentation liegt auch 
+vor.
+• In TEAMs finden Sie das shell script run_all. Es führt mehrere 
+Simulationen durch und vergleicht die Simulationsergebnisse mit der 
+Musterlösung (via diff). Das Skript führt die Simulation mit 
+unterschiedlichen Sequenzen von Pseudozufallszahlen durch. Ein Vergleich 
+mit der Musterlösung findet nur für den seed 2806 statt. Die anderen seeds 
+sind standardmäßig auskommentiert um Rechenzeit zu sparen.
+Bitte schauen Sie sich das Skript im Detail an, da die dort implementierten 
+Abläufe wesentlich sind. Das run_all script muss im Rahmen der 
+Abnahme erklärt werden. In TEAMs finden Sie zudem ein Makefile für die 
+Ausführung.
+• Die Datei run_all erzeugt zu FIFO, CLOCK und Aging Varianten für 
+Seitengrößen von 8, 16, 32 und 64 Integer Datenworten. Bei Aging wird 
+zusätzlich ein Zeitintervall zum Abfragen der R-Flags gefordert. Dies wird 
+durch den globalen Zähler g_count simuliert, der nach jedem 
+Speicherzugriff (nicht davor!) inkrementiert wird.

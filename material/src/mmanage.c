@@ -573,6 +573,6 @@ static void update_age_reset_ref(void){
             // Đặt lại bit tham chiếu của trang
             vmem->pt[age[i].page].flags &= ~PTF_REF;
         }
-} 
-
+    } 
+}
 // EOF

@@ -1,0 +1,35 @@
+5. Hinweise/Troubleshoot
+• Da ein OS unabhängiger sehr einfacher Zufallszahlengenerator in den Code 
+integriert wurde, liefert die Simulation auf OS-X und Linux dieselben 
+Ergebnisse. Damit können Sie die Aufgabe auf beiden Plattformen lösen.
+• Schauen Sie sich die mitgelieferte Software in Ruhe an.
+• Setzen Sie Ihre Lösung schrittweise um. Überprüfen Sie nach jedem Schritt, 
+dass die Lösung das gewünschte Verhalten realisiert.
+• Sie müssen auf der mitgelieferten Software aus diesem Semester aufbauen. 
+Die Grundfunktion, dass Anwendung und Memory Manager separate 
+Programme sind, muss erhalten bleiben. Dies gilt ebenfalls für die synchrone 
+Kommunikation und das Shared Memory für vmem.h . Den Rest des Codes 
+können Sie nach Belieben ändern, solange die Ergebnisse mit der 
+Musterlösung (Vergleich der LogFiles) übereinstimmen.
+• Zu Anfang werden wahrscheinlich die LogFiles des Aging Algorithmus von der
+Musterlösung abweichen. Ist dies der Fall, überprüfen Sie bitte folgende 
+Punkte Ihrer Implementierung:
+	o Wird Aging zum richtigen Zeitpunkt durchgeführt?
+	o Führen Sie das Aging durch, nachdem der Page Fault behoben und das 
+	Reference Flag gesetzt wurde.
+	o Können mehrere Pages aufgrund Ihres Alters ausgelagert werden 
+	(haben alle dasselbe Alter), lagern Sie die Page mit der höchsten 
+	Frame-Nummer aus.
+	o Wird eine Seite eingelagert, setzen Sie den Age Zähler auf 0x80. Das 
+	ist wichtig, damit die frisch eingelagerte Seite nicht sofort wieder 
+	ausgelagert wird, wenn zwei Page Faults hintereinander auftreten, 
+	ohne das zwischenzeitlich das Age neu berechnet wurde.
+• Als Anregung finden Sie im mitgelieferten Quellcode und in der 
+Dokumentation die Signaturen der Funktionen der Musterlösung. Sie 
+können natürlich eigene Konzepte verwirklichen.
+• Alle Signale verwenden denselben Signalhandler. Der Quellcode zur 
+Initialisierung und Installation der Signalhandler wird mitgeliefert.
+• Falls Sie mit dem C-Debugger der Eclipse Umgebung arbeiten, müssen Sie -
+damit die in der Aufgabe verwendeten Signale nicht mit der Steuerung des 
+Debuggers interferieren - der Debugger gemäß der Beschreibung der Datei 
+README_DEBUGGER eingestellt werden.
