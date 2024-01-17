@@ -508,7 +508,28 @@ void find_remove_fifo(int page, int * removedPage, int *frame){
 }
 
 static void find_remove_clock(int page, int * removedPage, int *frame){
-    
+    // Duyệt tất cả các khung để tìm khung chứa trang cần thay thế
+    for (int i = 0; i < VMEM_NFRAMES; i++) {
+        if (vmem->pt[i].flags & PTF_PRESENT) { //Nếu khung chứa trang hợp lệ
+            //Kiểm tra xem trang này có phải là ứng cử viên thay thế không
+            if (vmem->pt[i].frame == *removedPage) {
+                //Nếu đúng, gán khung này cho trang mới và thoát khỏi vòng lặp
+                *frame = i;
+                vmem->pt[page].frame = i;
+                vmem->pt[page].flags |= PTF_PRESENT;
+                return;
+            } else {
+                //Nếu không phải, kiểm tra xem trang này có được truy cập gần đây không
+                if (!(vmem->pt[i].flags & PTF_REF)) {
+                    //Nếu không, cập nhật removedPage bằng khung này
+                    *removedPage = vmem->pt[i].frame;
+                } else {
+                    //Nếu có, đặt lại bit tham chiếu và tiếp tục duyệt
+                    vmem->pt[i].flags &= ~PTF_REF;
+                }
+            }
+        }
+    }
 }
 
 static void find_remove_aging(int page, int * removedPage, int *frame){
