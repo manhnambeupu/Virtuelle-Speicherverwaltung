@@ -406,6 +406,7 @@ void vmem_init(void) {
     TEST_AND_EXIT_ERRNO(key == -1, "Error creating key with ftok");
 
     // Get shared memory segment
+    ///* We are creating the shm, so set the IPC_CREAT flag */
     shm_id = shmget(key, SHMSIZE, 0664 | IPC_CREAT);
     TEST_AND_EXIT_ERRNO(shm_id == -1, "Error creating shared memory with shmget");
 
@@ -419,7 +420,7 @@ void vmem_init(void) {
 
 int find_unused_frame() {
     for (int i = 0; i < VMEM_NFRAMES; i++) {
-        if (vmem->pt[i].flags == PTF_UNUSED) {
+        if (vmem->pt[i].flags == 0) {
             // Frame không được sử dụng, trả về chỉ số của nó
             return i;
         }
@@ -480,7 +481,7 @@ void remove_page_from_memory(int page){
 
   // Giải phóng khung đó trong bộ nhớ chính
   vmem->pt[page].frame = VOID_IDX;  
-  vmem->pt[page].flags = PTF_UNUSED; 
+  vmem->pt[page].flags = 0; 
 
   printf("Page removed %d from the frame %d\n", page, frame);
 }

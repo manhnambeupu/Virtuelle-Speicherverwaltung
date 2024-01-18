@@ -46,12 +46,13 @@ static void vmem_init(void) {
     TEST_AND_EXIT_ERRNO(shm_key == -1, "vmem_init: ftok failed!");
     /* We are only using the shm, don't set the IPC_CREAT flag */
     //Gắn một đoạn bộ nhớ chia sẻ đã tồn tại vào không gian địa chỉ của một quy trình.
+    //Zugang 0664 : bộ nhớ chia sẻ có quyền đọc và ghi 
     int shm_id = shmget(shm_key, SHMSIZE, 0664);
     TEST_AND_EXIT_ERRNO(shm_id == -1, "vmem_init: shmget failed!");
     /* Attach shared memory to vmem */
     //Gắn shared mem vào vmem
     vmem = (struct vmem_struct *)shmat(shm_id, NULL, 0);
-    TEST_AND_EXIT_ERRNO(vmem == (struct vmem_struct *)-1, "vmem_init: shmat failed!");
+    TEST_AND_EXIT_ERRNO(vmem == (struct vmem_struct *)-1, "Error attaching shared memory with shmat");
 }
 
 /**
@@ -98,6 +99,9 @@ static void vmem_put_page_into_mem(int address) {
         sendMsgToMmanager(pageFaultMsg);
     }
 
+    if (vmem == NULL){
+        vmem_init();
+    }
     /* Update the reference bit of the page table entry */
     vmem->pt[page].flags |= PTF_REF;
 }
