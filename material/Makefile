@@ -7,7 +7,7 @@ CFLAGS	 = -pthread -ggdb -Wall -std=gnu99 $(DFLAGS)
 
 ifdef VMEM_PAGESIZE
 # Supported page sizes 8 16 32 64
-CFLAGS	+= -DVMEM_PAGESIZE=$(VMEM_PAGESIZE)
+CFLAGS	+= -DVMEM_PAGESIZE=$(VMEM_PAGESIZE) -D_XOPEN_SOURCE=700
 endif
 
 ifeq ($(OS),Darwin)

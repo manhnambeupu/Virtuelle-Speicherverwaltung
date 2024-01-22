@@ -446,6 +446,9 @@ void allocate_page(const int req_page, const int g_count) {
 }
 */
 
+
+
+
 /**
  * @brief      This function will be called when a page fault has occurred. 
  *             It allocates a new page into memory using the FIFO page replacement algorithm. 
@@ -492,6 +495,57 @@ static void allocate_page(const int req_page, const int g_count) {
     PRINT_DEBUG((stderr, "Page %d allocated to frame %d.\n", req_page, frame));
 }
 
+/*
+static int clock_hand = 0;  // Con trỏ của thuật toán Clock
+
+void allocate_page(const int req_page, const int g_count) {
+    int frame = VOID_IDX;
+    int removedPage = VOID_IDX;
+
+    // Tìm khung trống hoặc khung sẽ được thay thế (Clock Algorithm)
+    while (true) {
+        // Lấy trang hiện tại được trỏ bởi con trỏ của thuật toán Clock
+        int current_page = vmem->pt[clock_hand].frame;
+
+        // Kiểm tra xem trang hiện tại có được sử dụng không
+        if (vmem->pt[current_page].flags & PTF_PRESENT) {
+            // Nếu trang có bit tham chiếu, đặt lại bit và di chuyển con trỏ tiếp theo
+            if (vmem->pt[current_page].flags & PTF_REF) {
+                vmem->pt[current_page].flags &= ~PTF_REF;
+                clock_hand = (clock_hand + 1) % VMEM_NFRAMES;
+            } else {
+                // Nếu trang không có bit tham chiếu, sẽ được thay thế
+                frame = vmem->pt[clock_hand].frame;
+                removedPage = current_page;
+                break;
+            }
+        } else {
+            // Nếu trang không được sử dụng, sử dụng trang này
+            frame = vmem->pt[clock_hand].frame;
+            break;
+        }
+    }
+
+    // Gọi hàm thay thế trang theo thuật toán Clock
+    find_remove_clock(req_page, &removedPage, &frame);
+
+    // Cập nhật bảng trang và thông tin liên quan
+    vmem->pt[req_page].frame = frame;
+    vmem->pt[req_page].flags |= PTF_PRESENT;
+    vmem->pt[req_page].flags &= ~PTF_REF;  // Đặt lại bit tham chiếu
+    clock_hand = (clock_hand + 1) % VMEM_NFRAMES;  // Di chuyển con trỏ của thuật toán Clock
+
+    // Log action
+    struct logevent le;
+    le.req_pageno = req_page;
+    le.replaced_page = removedPage;
+    le.alloc_frame = frame;
+    le.g_count = g_count;
+    le.pf_count = pf_count;
+    logger(le);
+}
+
+*/
 
 
 
