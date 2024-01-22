@@ -430,12 +430,13 @@ int find_unused_frame() {
     return VOID_IDX;
 }
 
+/*
 void allocate_page(const int req_page, const int g_count) {
     int frame = VOID_IDX;
     int removedPage = VOID_IDX;
     struct logevent le; 
 
-    /* Log action */
+
     le.req_pageno = req_page;
     le.replaced_page = removedPage;
     le.alloc_frame = frame;
@@ -443,6 +444,56 @@ void allocate_page(const int req_page, const int g_count) {
     le.pf_count = pf_count;
     logger(le); 
 }
+*/
+
+/**
+ * @brief      This function will be called when a page fault has occurred. 
+ *             It allocates a new page into memory using the FIFO page replacement algorithm. 
+ *             If all frames are in use, the corresponding page replacement algorithm will be called.
+ *             Please take into account that allocate_page must update the page table and log the page fault as well.
+ *
+ * @param[in]  req_page  The page that must be allocated due to the page fault.
+ * @param[in]  g_count   Current g_count value
+ */
+static void allocate_page(const int req_page, const int g_count) {
+    // Log the page fault
+    struct logevent le;
+    le.req_pageno = req_page;
+    le.replaced_page = VOID_IDX;
+    le.alloc_frame = VOID_IDX;
+    le.g_count = g_count;
+    le.pf_count = ++pf_count; // Increment page fault counter
+    logger(le);
+
+    // Check if the requested page is already in memory
+    if (vmem->pt[req_page].flags & PTF_PRESENT) {
+        PRINT_DEBUG((stderr, "Page %d is already in memory.\n", req_page));
+        return;  // Page is already in memory, no need to allocate
+    }
+
+    // Find an unused frame or a frame to be replaced using FIFO algorithm
+    int frame = find_unused_frame();
+    if (frame == VOID_IDX) {
+        // No unused frame found, use FIFO algorithm to find a frame to be replaced
+        int removedPage = VOID_IDX;
+        find_remove_fifo(req_page, &removedPage, &frame);
+
+        // Remove the selected page from memory
+        remove_page_from_memory(removedPage);
+    }
+
+    // Fetch the requested page from disk into the selected frame
+    fetch_page_from_disk(req_page, frame);
+
+    // Update the page table
+    vmem->pt[req_page].frame = frame;
+    vmem->pt[req_page].flags |= PTF_PRESENT;
+
+    PRINT_DEBUG((stderr, "Page %d allocated to frame %d.\n", req_page, frame));
+}
+
+
+
 
 void fetch_page_from_disk(int page, int frame){
         // Kiểm tra tính hợp lệ của page và frame
