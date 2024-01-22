@@ -547,6 +547,49 @@ void allocate_page(const int req_page, const int g_count) {
 
 */
 
+/*
+void allocate_page(const int req_page, const int g_count) {
+    // Kiểm tra xem trang đã tồn tại trong bộ nhớ chưa
+    if (vmem->pt[req_page].flags & PTF_PRESENT) {
+        // Trang đã tồn tại, không cần thực hiện thêm thao tác
+        return;
+    }
+
+    int frame = find_unused_frame();
+
+    if (frame == VOID_IDX) {
+        // Không có khung trống, sử dụng thuật toán aging để tìm trang cần thay thế
+        int removedPage = VOID_IDX;
+        find_remove_aging(req_page, &removedPage, &frame);
+
+        if (removedPage != VOID_IDX) {
+            // Loại bỏ trang cũ nhất nếu cần
+            remove_page_from_memory(removedPage);
+        }
+    }
+
+    // Fetch trang mới vào bộ nhớ
+    fetch_page_from_disk(req_page, frame);
+
+    // Cập nhật thông tin tuổi cho thuật toán aging
+    update_age_reset_ref();
+
+    // Cập nhật bảng trang cho trang mới
+    vmem->pt[req_page].frame = frame;
+    vmem->pt[req_page].flags |= PTF_PRESENT;
+
+    // Log action
+    struct logevent le;
+    le.req_pageno = req_page;
+    le.replaced_page = VOID_IDX;
+    le.alloc_frame = frame;
+    le.g_count = g_count;
+    le.pf_count = pf_count;
+    logger(le);
+}
+
+*/
+
 
 
 void fetch_page_from_disk(int page, int frame){
