@@ -448,8 +448,8 @@ void allocate_page(const int req_page, const int g_count) {
 
 
 
+/*
 
-/**
  * @brief      This function will be called when a page fault has occurred. 
  *             It allocates a new page into memory using the FIFO page replacement algorithm. 
  *             If all frames are in use, the corresponding page replacement algorithm will be called.
@@ -457,7 +457,7 @@ void allocate_page(const int req_page, const int g_count) {
  *
  * @param[in]  req_page  The page that must be allocated due to the page fault.
  * @param[in]  g_count   Current g_count value
- */
+ 
 static void allocate_page(const int req_page, const int g_count) {
     // Log the page fault
     struct logevent le;
@@ -493,7 +493,9 @@ static void allocate_page(const int req_page, const int g_count) {
     vmem->pt[req_page].flags |= PTF_PRESENT;
 
     PRINT_DEBUG((stderr, "Page %d allocated to frame %d.\n", req_page, frame));
-}
+} 
+
+*/
 
 /*
 static int clock_hand = 0;  // Con trỏ của thuật toán Clock
@@ -544,10 +546,9 @@ void allocate_page(const int req_page, const int g_count) {
     le.pf_count = pf_count;
     logger(le);
 }
-
 */
 
-/*
+
 void allocate_page(const int req_page, const int g_count) {
     // Kiểm tra xem trang đã tồn tại trong bộ nhớ chưa
     if (vmem->pt[req_page].flags & PTF_PRESENT) {
@@ -588,7 +589,7 @@ void allocate_page(const int req_page, const int g_count) {
     logger(le);
 }
 
-*/
+
 
 
 
@@ -610,7 +611,14 @@ void fetch_page_from_disk(int page, int frame){
     // Cập nhật bảng trang
     vmem->pt[page].frame = frame;
     vmem->pt[page].flags |= PTF_PRESENT; // Đánh dấu trang đã có trong bộ nhớ
-
+     // Đặt bộ đếm Age của trang vừa nạp vào thành 0x80
+    // Tìm mục position page trong mảng age và đặt tuổi của nó thành 0x80
+    for (int i = 0; i < VMEM_NFRAMES; i++) {
+        if (age[i].page == page) {
+            age[i].age = 0x80;
+            break;
+        }
+    }
     printf("Page loaded %d to the frame %d\n", page, frame);
 }
 
@@ -684,15 +692,21 @@ static void find_remove_clock(int page, int * removedPage, int *frame){
 static void find_remove_aging(int page, int * removedPage, int *frame){
     int oldest_age = 0x7F; 
     int oldest_page = VOID_IDX;
+    int oldest_frame = -1;
     int i;
 
     // Duyệt tất cả các khung để tìm khung có trang lâu nhất không được truy cập
     for (i = 0; i < VMEM_NFRAMES; i++) { 
         if (vmem->pt[age[i].page].flags & PTF_PRESENT) { //Nếu khung chứa trang hợp lệ
             //Kiểm tra xem trang này có phải là trang lâu nhất không
-            if (age[i].age > oldest_age) { 
+            /*Nếu tuổi của trang hiện tại (age[i].age) bằng với tuổi lâu nhất đã được ghi nhận (oldest_age), 
+            và số khung của trang hiện tại (vmem->pt[age[i].page].frame) 
+            lớn hơn số khung của trang lâu nhất đã được ghi nhận (oldest_frame), thì trang hiện tại sẽ được coi là trang "lâu nhất".
+            Điều này đảm bảo rằng nếu có nhiều trang có cùng tuổi, trang có số khung cao nhất sẽ được loại bỏ*/
+            if (age[i].age > oldest_age || (age[i].age == oldest_age && vmem->pt[age[i].page].frame > oldest_frame)) { 
                 oldest_age = age[i].age; 
                 oldest_page = age[i].page; 
+                oldest_frame = vmem->pt[age[i].page].frame; // Cập nhật khung lâu nhất
             } 
         }
     }

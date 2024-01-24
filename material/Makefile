@@ -12,10 +12,10 @@ endif
 
 ifeq ($(OS),Darwin)
 	# Apple OS, librt.so not required
-	LDFLAGS =  -lpthread 
+	LDFLAGS =	-lpthread 
 else
 	# Linux OS
-	LDFLAGS =  -lrt -lpthread 
+	LDFLAGS =	 -lrt -lpthread
 endif
 
 SRCDIR   = ./src
@@ -54,7 +54,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 # link an executable
 $(BINDIR)/% : $(OBJDIR)/%.o $(subst $(SRCDIR)/,$(OBJDIR)/,$(modulefiles:.c=.o)) 
 	@mkdir -p $(@D)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^ -lrt
 
 clean:
 	rm -r -f $(OBJDIR) $(BINDIR) 
