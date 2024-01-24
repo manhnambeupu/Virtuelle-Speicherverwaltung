@@ -25,7 +25,11 @@
 #ifndef _SYNCDATAEXCHANGE_H
 #define _SYNCDATAEXCHANGE_H
 #include <stdbool.h>
+#define SHMKEY_SYNC_COM            "./src/syncdataexchange.h"          //!< First paremater for shared memory generation via ftok function
+#define SHMPROCID_SYNC_COM         3112                                //!< Second paremater for shared memory generation via ftok function
 
+#define NAMED_SEM_WAKEUP_MMANAGER  "BS_A3_mmanager" //!< Semaphore to inform memory manager about new task
+#define NAMED_SEM_WAKEUP_VMAPP     "BS_A3_vmapp"    //!< Semaphore to inform vmapp that task has been
 /*
  * @brief Datenstruktur zur Beschreibung eines Auftrags / einer Message
  */

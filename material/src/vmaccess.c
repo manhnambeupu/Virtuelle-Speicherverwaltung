@@ -8,7 +8,7 @@
 #include "vmaccess.h"
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include "syncdataexchange.c"
+//#include "syncdataexchange.c"
 #include "syncdataexchange.h"
 #include "vmem.h"
 #include "debug.h"

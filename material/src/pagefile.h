@@ -14,7 +14,7 @@
  *
  *  @return     void 
  ****************************************************************************************/
-void init_pagefile(void);
+ void init_pagefile(void);
 
 /**
  *****************************************************************************************
@@ -27,7 +27,7 @@ void init_pagefile(void);
  *
  *  @return     void 
  ****************************************************************************************/
-void fetch_page_from_pagefile(int pageNo, unsigned char *frame_start);
+ void fetch_page_from_pagefile(int pageNo, unsigned char *frame_start);
 
 /**
  *****************************************************************************************
@@ -39,14 +39,14 @@ void fetch_page_from_pagefile(int pageNo, unsigned char *frame_start);
  *
  *  @return     void 
  ****************************************************************************************/
-void store_page_to_pagefile(int pageNo, unsigned char *frame_start);
+ void store_page_to_pagefile(int pageNo, unsigned char *frame_start);
 
 /**
  *****************************************************************************************
  *  @brief      This function cleans and closes page file module.
  *
  *  @return     void 
- ****************************************************************************************/
-void cleanup_pagefile(void);
+ ****************************************************************************************/ 
+ void cleanup_pagefile(void);
 
 #endif

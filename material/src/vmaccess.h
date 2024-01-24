@@ -19,7 +19,7 @@
  * 
  *  @return     The byte read from virtual memory.
  ****************************************************************************************/
-unsigned char vmem_read(int address);
+    unsigned char vmem_read(int address);
 
 /**
  *****************************************************************************************
@@ -33,6 +33,6 @@ unsigned char vmem_read(int address);
  * 
  *  @return     void
  ****************************************************************************************/
-void vmem_write(int address, unsigned char data);
+    void vmem_write(int address, unsigned char data);
 
 #endif
