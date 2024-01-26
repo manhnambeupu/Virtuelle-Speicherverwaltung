@@ -54,7 +54,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 # link an executable
 $(BINDIR)/% : $(OBJDIR)/%.o $(subst $(SRCDIR)/,$(OBJDIR)/,$(modulefiles:.c=.o)) 
 	@mkdir -p $(@D)
-	$(CC) $(LDFLAGS) -o $@ $^ -lrt
+	$(CC) $(LDFLAGS) -o $@ $^ 
 
 clean:
 	rm -r -f $(OBJDIR) $(BINDIR) 

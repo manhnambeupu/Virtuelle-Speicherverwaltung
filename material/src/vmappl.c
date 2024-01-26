@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <strings.h>
+
 #include "vmaccess.h"
 #include "my_rand.h"
 #include "vmappl.h"

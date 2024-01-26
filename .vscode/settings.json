@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "syncdataexchange.h": "c"
+        "syncdataexchange.h": "c",
+        "strings.h": "c"
     }
 }

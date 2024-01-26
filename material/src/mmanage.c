@@ -21,6 +21,7 @@
 #include <string.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <strings.h>
 
 #include "mmanage.h"
 #include "debug.h"
@@ -457,9 +458,9 @@ void allocate_page(const int req_page, const int g_count) {
  *
  * @param[in]  req_page  The page that must be allocated due to the page fault.
  * @param[in]  g_count   Current g_count value
- 
+ */
 static void allocate_page(const int req_page, const int g_count) {
-    // Log the page fault
+    // Log the page faultmake
     struct logevent le;
     le.req_pageno = req_page;
     le.replaced_page = VOID_IDX;
@@ -495,7 +496,7 @@ static void allocate_page(const int req_page, const int g_count) {
     PRINT_DEBUG((stderr, "Page %d allocated to frame %d.\n", req_page, frame));
 } 
 
-*/
+
 
 /*
 static int clock_hand = 0;  // Con trỏ của thuật toán Clock
@@ -548,6 +549,7 @@ void allocate_page(const int req_page, const int g_count) {
 }
 */
 
+/*
 
 void allocate_page(const int req_page, const int g_count) {
     // Kiểm tra xem trang đã tồn tại trong bộ nhớ chưa
@@ -588,7 +590,7 @@ void allocate_page(const int req_page, const int g_count) {
     le.pf_count = pf_count;
     logger(le);
 }
-
+*/
 
 
 
